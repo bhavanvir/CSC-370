@@ -28,15 +28,23 @@ class ImplementMe:
             relations.extend(relation.attributes)
         relations = set(relations)
 
-        closure_set = [[] for i in range(len(lhs))]
+        combined = [[] for i in range(len(lhs))]
         for i in range(len(lhs)):
-            closure_set[i].extend(lhs[i])
-            closure_set[i].extend(rhs[i])
-            if set(closure_set[i]).difference(relations) == set():
-                return 0;         
+            combined[i].extend(lhs[i])
+            combined[i].extend(rhs[i])
 
+        """
+        Compute the intersection between all pairs of items in the combined list,
+        then union the intersection set with the appropriate FD
+        """
+        difference = []
+        for i in range(len(combined)):
+            if i + 1 < len(combined):
+                difference.append(set(combined[i]).intersection(combined[i + 1]))
+        print(combined, "AND", difference)
+                
         closure_diff = [[] for i in range(len(lhs))]
         for i in range(len(lhs)):
-            closure_diff[i] = (relations.difference(closure_set[i])).union(lhs[i])
+            closure_diff[i] = (relations.difference(combined[i])).union(lhs[i])
 
         return 500
