@@ -19,9 +19,9 @@ class ImplementMe:
         fset = [[] for i in range(len(fdep))]
         i = 0
         for fd in fdep:
-            to_close = fd.left_hand_side.union(fd.right_hand_side)
+            attributes = fd.left_hand_side.union(fd.right_hand_side)
             if i < len(fdep):
-                fset[i] = Helpers.closure(fds, to_close)
+                fset[i] = Helpers.closure(fds, attributes)
                 i += 1
         print(fset)
         
