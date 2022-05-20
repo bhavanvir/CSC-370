@@ -21,7 +21,7 @@ class ImplementMe:
         for fd in fdep:
             to_close = fd.left_hand_side.union(fd.right_hand_side)
             if i < len(fdep):
-                fset[i] = (closure(fds, to_close))
+                fset[i] = Helpers.closure(fds, to_close)
                 i += 1
         print(fset)
         
@@ -32,14 +32,16 @@ class ImplementMe:
         
         return 500
 
-def closure(fds, dependency):
-    fdep = fds.functional_dependencies
-    result = set(dependency)
-    more = True
-    while more:
-        more = False
-        for fd in fdep:
-            if fd.left_hand_side.issubset(result) and not fd.right_hand_side.issubset(result):
-                result.update(fd.right_hand_side)
-                more = True
-    return result
+class Helpers:
+    @staticmethod
+    def closure(fds, dependency):
+        fdep = fds.functional_dependencies
+        result = set(dependency)
+        more = True
+        while more:
+            more = False
+            for fd in fdep:
+                if fd.left_hand_side.issubset(result) and not fd.right_hand_side.issubset(result):
+                    result.update(fd.right_hand_side)
+                    more = True
+        return result
