@@ -23,8 +23,10 @@ class ImplementMe:
             if i < len(fdep):
                 fset[i] = Helpers.closure(fds, attributes)
                 i += 1
-        print(Helpers.violations(relations, fset))
         
+        violations = Helpers.violations(relations, fset)
+        violations = [i for i in violations if i]
+
         return 500
 
 class Helpers:
@@ -39,6 +41,7 @@ class Helpers:
                 if fd.left_hand_side.issubset(result) and not fd.right_hand_side.issubset(result):
                     result.update(fd.right_hand_side)
                     more = True
+
         return result
 
     @staticmethod
@@ -52,4 +55,5 @@ class Helpers:
         for i in range(len(fset)):
             if relation.difference(fset[i]) != set():
                 violations[i] = fset[i]
+
         return violations
