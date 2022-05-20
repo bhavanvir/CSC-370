@@ -17,7 +17,6 @@ class ImplementMe:
     def DecompositionSteps( relations, fds ):
         fdep = fds.functional_dependencies
         fset = [[] for i in range(len(fdep))]
-        print(fset[0])
         i = 0
         for fd in fdep:
             to_close = fd.left_hand_side.union(fd.right_hand_side)
