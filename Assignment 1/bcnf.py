@@ -14,7 +14,7 @@ class ImplementMe:
     # This function determines how many recursive steps were required for that
     # decomposition or -1 if the relations are not a correct decomposition.
     @staticmethod
-    def DecompositionSteps( relations, fds ):
+    def DecompositionSteps(relations, fds):
         fdep = fds.functional_dependencies
         fset = [[] for i in range(len(fdep))]
         i = 0
@@ -23,12 +23,7 @@ class ImplementMe:
             if i < len(fdep):
                 fset[i] = Helpers.closure(fds, attributes)
                 i += 1
-        print(fset)
-        
-        """ relation_set = relations.relations
-        relations = []
-        for relation in relation_set:
-            relations.extend(relation.attributes) """
+        print(Helpers.violations(relations, fset))
         
         return 500
 
@@ -45,3 +40,16 @@ class Helpers:
                     result.update(fd.right_hand_side)
                     more = True
         return result
+
+    @staticmethod
+    def violations(relations, fset):
+        rels = relations.relations
+        relation = set()
+        for r in rels:
+            relation.update(r.attributes)
+        
+        violations = [[] for i in range(len(fset))]
+        for i in range(len(fset)):
+            if relation.difference(fset[i]) != set():
+                violations[i] = fset[i]
+        return violations
