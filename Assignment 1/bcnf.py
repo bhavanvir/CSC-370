@@ -31,7 +31,7 @@ class ImplementMe:
         
         violations = Helpers.violations(relations, fset)
         violations = [i for i in violations if i]
-        #print(Helpers.isimplied(fds, lhs, rhs))
+        print(Helpers.minimize(fds, lhs, rhs))
 
         return 500
 
@@ -76,3 +76,12 @@ class Helpers:
     @staticmethod 
     def isimplied(fds, lhs, rhs):
         return Helpers.closure(fds, lhs).issuperset(rhs)
+
+    @staticmethod
+    def minimize(fds, lhs, rhs):
+        cand = lhs.copy()
+        for attr in lhs:
+            cand.remove(attr)
+            if not Helpers.isimplied(fds, cand, rhs):
+                cand.add(attr)
+        return cand
