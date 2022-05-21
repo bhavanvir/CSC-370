@@ -17,8 +17,13 @@ class ImplementMe:
     def DecompositionSteps(relations, fds):
         fdep = fds.functional_dependencies
         fset = [[] for i in range(len(fdep))]
+        lhs = set()
+        rhs = set()
+
         i = 0
         for fd in fdep:
+            lhs.update(fd.left_hand_side)
+            rhs.update(fd.right_hand_side)
             attributes = fd.left_hand_side.union(fd.right_hand_side)
             if i < len(fdep):
                 fset[i] = Helpers.closure(fds, attributes)
@@ -26,7 +31,7 @@ class ImplementMe:
         
         violations = Helpers.violations(relations, fset)
         violations = [i for i in violations if i]
-        print(Helpers.project(fds, attributes))
+        #print(Helpers.isimplied(fds, lhs, rhs))
 
         return 500
 
@@ -67,3 +72,7 @@ class Helpers:
             if fd.left_hand_side.issubset(attributes) and fd.right_hand_side.issubset(attributes):
                 result.add(fd)
         return result
+    
+    @staticmethod 
+    def isimplied(fds, lhs, rhs):
+        return Helpers.closure(fds, lhs).issuperset(rhs)
