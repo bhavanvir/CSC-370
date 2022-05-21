@@ -26,14 +26,15 @@ class ImplementMe:
         
         violations = Helpers.violations(relations, fset)
         violations = [i for i in violations if i]
+        print(Helpers.project(fds, attributes))
 
         return 500
 
 class Helpers:
     @staticmethod
-    def closure(fds, dependency):
+    def closure(fds, attributes):
         fdep = fds.functional_dependencies
-        result = set(dependency)
+        result = set(attributes)
         more = True
         while more:
             more = False
@@ -57,3 +58,12 @@ class Helpers:
                 violations[i] = fset[i]
 
         return violations
+
+    @staticmethod
+    def project(fds, attributes):
+        fdep = fds.functional_dependencies
+        result = set()
+        for fd in fdep:
+            if fd.left_hand_side.issubset(attributes) and fd.right_hand_side.issubset(attributes):
+                result.add(fd)
+        return result
