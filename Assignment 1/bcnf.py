@@ -16,7 +16,6 @@ class ImplementMe:
     @staticmethod
     def DecompositionSteps(relations, fds):
         fdep = fds.functional_dependencies
-        fset = [[] for i in range(len(fdep))]
         lhs = set()
         rhs = set()
 
@@ -24,15 +23,9 @@ class ImplementMe:
         for fd in fdep:
             lhs.update(fd.left_hand_side)
             rhs.update(fd.right_hand_side)
-            attributes = fd.left_hand_side.union(fd.right_hand_side)
-            if i < len(fdep):
-                fset[i] = Helpers.closure(fds, attributes)
-                i += 1
         
-        violations = Helpers.violations(relations, fset)
-        violations = [i for i in violations if i]
-        print(Helpers.minimize(fds, lhs, rhs))
-
+        Helpers.decompose(relations, fds)
+    
         return 500
 
 class Helpers:
@@ -51,7 +44,17 @@ class Helpers:
         return result
 
     @staticmethod
-    def violations(relations, fset):
+    def violations(relations, fds):
+        fdep = fds.functional_dependencies
+        fset = [[] for i in range(len(fdep))]
+
+        i = 0
+        for fd in fdep:
+            attributes = fd.left_hand_side.union(fd.right_hand_side)
+            if i < len(fdep):
+                fset[i] = Helpers.closure(fds, attributes)
+                i += 1
+
         rels = relations.relations
         relation = set()
         for r in rels:
@@ -62,17 +65,16 @@ class Helpers:
             if relation.difference(fset[i]) != set():
                 violations[i] = fset[i]
 
-        return violations
+        lhs = [FunctionalDependency for i in range(len(violations))]
+        i = 0
+        for fd, v in zip(fdep, violations):
+            if v:
+                lhs[i] = fd
+                i += 1
+        lhs = [i for i in lhs if i is not FunctionalDependency]
+        
+        return lhs
 
-    @staticmethod
-    def project(fds, attributes):
-        fdep = fds.functional_dependencies
-        result = set()
-        for fd in fdep:
-            if fd.left_hand_side.issubset(attributes) and fd.right_hand_side.issubset(attributes):
-                result.add(fd)
-        return result
-    
     @staticmethod 
     def isimplied(fds, lhs, rhs):
         return Helpers.closure(fds, lhs).issuperset(rhs)
@@ -80,8 +82,40 @@ class Helpers:
     @staticmethod
     def minimize(fds, lhs, rhs):
         cand = lhs.copy()
-        for attr in lhs:
-            cand.remove(attr)
-            if not Helpers.isimplied(fds, cand, rhs):
-                cand.add(attr)
+        for l, r in zip(lhs, rhs):
+            cand.remove(l)
+            if not Helpers.isimplied(fds, l, r):
+                cand.extend(l)
         return cand
+
+    @staticmethod
+    def project(fds, attributes):
+        fdep = fds.functional_dependencies
+        lhs, rhs = [], []
+        result = set()
+        for fd in fdep:
+            if fd.left_hand_side.issubset(attributes) and fd.right_hand_side.issubset(attributes):
+                lhs.append(fd.left_hand_side)
+                rhs.append(fd.right_hand_side)
+                result.add(fd)
+        print(result)
+        #return Helpers.minimize(fds, lhs, rhs)
+    
+    @staticmethod
+    def decompose(relations, fds):
+        decompositions = []
+
+        rels = relations.relations
+        rset = set()
+        for r in rels:
+            rset.update(r.attributes)
+
+        violations = Helpers.violations(relations, fds)
+        if len(violations) == 0:
+           return rset
+        else:
+            for v in violations:
+                c = Helpers.closure(fds, v.left_hand_side.union(v.right_hand_side))
+                R1 = c
+                R2 = (rset.difference(c)).union(v.left_hand_side)
+            print(R1, "AND", R2)
