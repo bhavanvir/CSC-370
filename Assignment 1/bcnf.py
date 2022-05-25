@@ -16,11 +16,12 @@ class ImplementMe:
     @staticmethod
     def DecompositionSteps(relations, fds):
         rels = relations.relations
-        rset = set()
+        R = set()
         for r in rels:
-            rset.update(r.attributes)
+            R.update(r.attributes)
 
-        print(Helpers.decompose(rset, fds))
+        print(Helpers.violations(R, fds))
+        #print(Helpers.decompose(relations, R, fds))
 
         return 500
 
@@ -73,18 +74,20 @@ class Helpers:
         for fd in fdep:
             if fd.left_hand_side.issubset(attributes) and fd.right_hand_side.issubset(attributes):
                 result.add(fd)
-
+        
         return FDSet(result)
     
     @staticmethod
-    def decompose(relations, fds):
-        violations = Helpers.violations(relations, fds)
+    def decompose(relations, R, fds):
+        violations = Helpers.violations(R, fds)
         if len(violations) == 0:
-           return relations
+            return relations
         else:
             for v in violations:
-                """ c = Helpers.closure(fds, v.left_hand_side.union(v.right_hand_side))
-                R1 = Helpers.decompose(c, Helpers.project(fds, c))
-                R2 = Helpers.decompose(relations.difference(c), Helpers.project(fds, (relations.difference(c)).union(v.left_hand_side)))
-                print(R1, "AND", R2) """
-                print(v)
+                c = Helpers.closure(fds, v.left_hand_side.union(v.right_hand_side))
+                R1 = c
+                R2 = R.difference(c).union(v.left_hand_side)
+                Helpers.decompose(relations, R1, Helpers.project(fds, R1))
+                Helpers.decompose(relations, R2, Helpers.project(fds, R2))
+                
+            return R1, R2
