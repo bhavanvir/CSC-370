@@ -17,13 +17,17 @@ class ImplementMe:
     def DecompositionSteps(relations, fds):
         R = set()
         L = set()
+        counter = 0
         for r in relations.relations:
             L.update(r.attributes)
+            counter += 1
         R.add(Relation(L))
         R = RelationSet(R)
 
         violations = ImplementMe.violations(R, fds)
         if len(violations) == 0:
+            if counter > 1:
+                return -1
             return 0
         T = ImplementMe.decompose(relations, R, fds)
         if T == relations:
