@@ -21,8 +21,15 @@ class ImplementMe:
             L.update(r.attributes)
         R.add(Relation(L))
         R = RelationSet(R)
-   
-        return ImplementMe.decompose(relations, R, fds)
+
+        violations = ImplementMe.violations(R, fds)
+        if len(violations) == 0:
+            return 0
+        T = ImplementMe.decompose(relations, R, fds)
+        if T == relations:
+            return 1
+        else:
+            return -1
 
     @staticmethod
     def closure(fds, attributes):
@@ -48,38 +55,22 @@ class ImplementMe:
         
         return violations
 
-    """ @staticmethod
-    def project(fds, attributes):
-        result = set()
-        for fd in fds.functional_dependencies:
-            if fd.left_hand_side.issubset(attributes) and fd.right_hand_side.issubset(attributes):
-                result.add(fd)
-
-        return FDSet(result) """
-
-    @staticmethod
-    def is_invalid (relations, fds):
-        return len(ImplementMe.violations(relations, fds)) > 0
-
     @staticmethod
     def decompose(relations, R, fds):
         violations = ImplementMe.violations(relations, fds)
-        
-        if R == relations or len(violations) == 0:
-            return 0
-        if len(violations) > 0:
-            if(len(relations.relations) < len(R.relations) or len(relations) > len(R.relations)):
-                return -1
-        else:
-            c = ImplementMe.closure(fds, violations[0].left_hand_side.union(violations[0].right_hand_side))
-        
-            R1 = c
-            R2 = R.relations.difference(c).union(violations[0].left_hand_side)
-       
-            T = set()
-            
-            T.add(Relation(R1))
-            T.add(Relation(R2))
-            T = RelationSet(T)
+        c = ImplementMe.closure(fds, violations[0].left_hand_side.union(violations[0].right_hand_side))
+    
+        L = set()
+        for r in R.relations:
+            L = r.attributes
+            break
 
-            return 1 + ImplementMe.decompose(relations, T, fds)
+        R1 = c
+        R2 = L.difference(c).union(violations[0].left_hand_side)
+
+        T = set()
+        T.add(Relation(R1))
+        T.add(Relation(R2))
+        T = RelationSet(T)
+            
+        return T
