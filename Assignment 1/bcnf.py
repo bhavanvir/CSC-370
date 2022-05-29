@@ -35,6 +35,7 @@ class ImplementMe:
         else:
             return -1
 
+    #Reference: https://oer.gitlab.io/cs/functional-dependencies/functional_dependencies.html#functional_dependencies.FDSet.closure
     @staticmethod
     def closure(fds, attributes):
         result = set(attributes)
