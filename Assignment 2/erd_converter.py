@@ -9,11 +9,11 @@ from table import *
 # by the ERD.
 #
 # @TODO: Implement me!
-def is_inlist(dependencies, current_dependency):
+def is_missing(dependencies, current_dependency):
     for dependency in dependencies:
         if dependency not in current_dependency:
-            return False
-    return True
+            return True
+    return False
 
 def multiplicity(entity_sets, relationship):
     connections = []
@@ -58,16 +58,10 @@ def convert_to_table(erd):
                 dependents[many_to_one].append((entity, relationship.name))
             excluded_table = excluded_table.union({relationship.name})
         elif len(entities) == 1:
-            counter = 0
             for entity in erd.entity_sets:
                 if relationship.name in entity.supporting_relations:
-                    counter += 1
-
-            if counter != 0:
-                for entity in erd.entity_sets:
-                    if relationship.name in entity.supporting_relations:
-                        initial_entity = [entity][0]
-                        dependents[initial_entity.name].append((entities[0].name, relationship.name))
+                    initial_entity = [entity][0]
+                    dependents[initial_entity.name].append((entities[0].name, relationship.name))
             excluded_table = excluded_table.union({relationship.name})
         
         temp_entity = []
@@ -78,7 +72,6 @@ def convert_to_table(erd):
 
     entities = list(erd.entity_sets)
     while len(entities) > 0:
-        individial_entity = []
         for entity in entities:
             temp_dependents, temp_converted_table = [], []
             for dependency in dependents[entity.name]:
@@ -86,7 +79,7 @@ def convert_to_table(erd):
             for table in converted_table:
                 temp_converted_table.append(table.name)
 
-            if is_inlist(temp_dependents, temp_converted_table):
+            if not is_missing(temp_dependents, temp_converted_table):
                 individial_entity = entity
                 entities.remove(entity)
                 break
