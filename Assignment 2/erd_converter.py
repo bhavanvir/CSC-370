@@ -15,6 +15,11 @@ def is_missing(dependencies, current_dependency):
             return True
     return False
 
+def is_primary_key(relationship):
+    if len(relationship.primary_key) == 0:
+        return True
+    return False
+
 def multiplicity(entity_sets, relationship):
     connections = []
     for connection in entity_sets.connections:
@@ -25,6 +30,7 @@ def multiplicity(entity_sets, relationship):
 def convert_to_table(erd):
     dependents, relations = {}, {}
     converted_table, excluded_table = [], set()
+    MANY, ONE = Multiplicity.MANY, Multiplicity.ONE
     
     for entity in erd.entity_sets:
         if len(entity.parents) > 0:
@@ -42,16 +48,16 @@ def convert_to_table(erd):
 
         counter = 0
         for entity in entities:
-            if multiplicity(entity, relationship.name) == Multiplicity.MANY:
+            if multiplicity(entity, relationship.name) == MANY:
                 counter += 1
 
-        if counter == 1 and len(relationship.primary_key) == 0:
+        if counter == 1 and is_primary_key(relationship):
             many_to_one, one_to_many = [], []
             for entity in entities:
                 entity_multiplicity = multiplicity(entity, relationship.name)
-                if entity_multiplicity == Multiplicity.MANY:
+                if entity_multiplicity == MANY:
                     many_to_one = [entity.name][0]
-                elif entity_multiplicity == Multiplicity.ONE:
+                elif entity_multiplicity == ONE:
                     one_to_many.append(entity.name)
                 
             for entity in one_to_many:
@@ -71,7 +77,7 @@ def convert_to_table(erd):
             relations[relationship.name] = temp_entity
 
     entities = list(erd.entity_sets)
-    while len(entities) > 0:
+    for i in range(len(entities)):
         for entity in entities:
             temp_dependents, temp_converted_table = [], []
             for dependency in dependents[entity.name]:
@@ -124,7 +130,7 @@ def convert_to_table(erd):
                                     if member[0] == table.name:
                                         temp_member.append(member)
                                         
-                                if temp_member[0][1] != Multiplicity.ONE:
+                                if temp_member[0][1] != ONE:
                                     primary_keys = primary_keys.union(table.primary_key)
                                     
                                 attributes = attributes.union(table.primary_key)
