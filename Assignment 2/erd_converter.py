@@ -20,6 +20,16 @@ def is_primary_key(relationship):
         return True
     return False
 
+def num_entities(entities, relationship, MANY):
+    counter = 0
+    for entity in entities:
+        if multiplicity(entity, relationship.name) == MANY:
+            counter += 1
+    
+    if counter == 1:
+        return True
+    return False
+
 def multiplicity(entity_sets, relationship):
     connections = []
     for connection in entity_sets.connections:
@@ -46,12 +56,7 @@ def convert_to_table(erd):
                 if relationship.name in connection[0]:
                     entities.append(entity)
 
-        counter = 0
-        for entity in entities:
-            if multiplicity(entity, relationship.name) == MANY:
-                counter += 1
-
-        if counter == 1 and is_primary_key(relationship):
+        if num_entities(entities, relationship, MANY) and is_primary_key(relationship):
             many_to_one, one_to_many = [], []
             for entity in entities:
                 entity_multiplicity = multiplicity(entity, relationship.name)
@@ -63,7 +68,7 @@ def convert_to_table(erd):
             for entity in one_to_many:
                 dependents[many_to_one].append((entity, relationship.name))
             excluded_table = excluded_table.union({relationship.name})
-        elif len(entities) == 1:
+        elif not num_entities(entities, relationship, MANY) and len(entities) == 1:
             for entity in erd.entity_sets:
                 if relationship.name in entity.supporting_relations:
                     initial_entity = [entity][0]
@@ -138,6 +143,8 @@ def convert_to_table(erd):
                                 table_key = tuple(table.primary_key)
                                 key_name_pair = [(table_key, table.name, table_key)]
                                 foreign_keys = foreign_keys.union(set(key_name_pair))
-                converted_table += [Table(relationship.name, attributes, primary_keys, foreign_keys)]
+                
+                new_table = Table(relationship.name, attributes, primary_keys, foreign_keys)
+                converted_table += [new_table]
  
     return Database(converted_table)
