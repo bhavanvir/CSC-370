@@ -20,10 +20,10 @@ def is_primary_key(relationship):
         return True
     return False
 
-def num_entities(entities, relationship, MANY):
+def is_entity(entities, relationship):
     counter = 0
     for entity in entities:
-        if multiplicity(entity, relationship.name) == MANY:
+        if multiplicity(entity, relationship.name) == Multiplicity.MANY:
             counter += 1
     
     if counter == 1:
@@ -37,17 +37,38 @@ def multiplicity(entity_sets, relationship):
             connections.append(connection[1])
     return connections[0]
 
-def convert_to_table(erd):
-    dependents, relations = {}, {}
-    converted_table, excluded_table = [], set()
-    MANY, ONE = Multiplicity.MANY, Multiplicity.ONE
-    
+def erd_dependencies(erd):
+    dependents = {}
     for entity in erd.entity_sets:
         if len(entity.parents) > 0:
             for parent in entity.parents:
                 dependents[entity.name] = [(parent, "isA")]
         else:
             dependents[entity.name] = []
+    return dependents
+
+def erd_entities(erd, entities, relationship, relations, flag):
+    temp_entity, many_to_one, one_to_many = [], [], []
+    for entity in entities:
+        if flag == True:
+            entity_multiplicity = multiplicity(entity, relationship.name)
+            temp_entity.append((entity.name, entity_multiplicity))
+            relations[relationship.name] = temp_entity
+        elif flag == False:
+            entity_multiplicity = multiplicity(entity, relationship.name)
+            if entity_multiplicity == Multiplicity.MANY:
+                many_to_one = [entity.name][0]
+            elif entity_multiplicity == Multiplicity.ONE:
+                one_to_many.append(entity.name)
+                
+    if flag == True:
+        return relations
+    elif flag == False:    
+        return many_to_one, one_to_many
+
+def convert_to_table(erd):
+    dependents, relations = erd_dependencies(erd), {}
+    converted_table, excluded_table = [], set()
 
     for relationship in erd.relationships:
         entities = []
@@ -56,30 +77,19 @@ def convert_to_table(erd):
                 if relationship.name in connection[0]:
                     entities.append(entity)
 
-        if num_entities(entities, relationship, MANY) and is_primary_key(relationship):
-            many_to_one, one_to_many = [], []
-            for entity in entities:
-                entity_multiplicity = multiplicity(entity, relationship.name)
-                if entity_multiplicity == MANY:
-                    many_to_one = [entity.name][0]
-                elif entity_multiplicity == ONE:
-                    one_to_many.append(entity.name)
-                
+        if is_entity(entities, relationship) and is_primary_key(relationship):
+            many_to_one, one_to_many = erd_entities(erd, entities, relationship, relations, False)
             for entity in one_to_many:
                 dependents[many_to_one].append((entity, relationship.name))
             excluded_table = excluded_table.union({relationship.name})
-        elif not num_entities(entities, relationship, MANY) and len(entities) == 1:
+        elif not is_entity(entities, relationship) and len(entities) == 1:
             for entity in erd.entity_sets:
                 if relationship.name in entity.supporting_relations:
                     initial_entity = [entity][0]
                     dependents[initial_entity.name].append((entities[0].name, relationship.name))
             excluded_table = excluded_table.union({relationship.name})
-        
-        temp_entity = []
-        for entity in entities:
-            entity_multiplicity = multiplicity(entity, relationship.name)
-            temp_entity.append((entity.name, entity_multiplicity))
-            relations[relationship.name] = temp_entity
+        else:
+            erd_entities(erd, entities, relationship, relations, True)
 
     entities = list(erd.entity_sets)
     for i in range(len(entities)):
@@ -96,7 +106,6 @@ def convert_to_table(erd):
                 break
 
         attributes, foreign_keys, primary_keys = set(individial_entity.attributes), set(), set(individial_entity.primary_key)
-        
         for dependency in dependents[individial_entity.name]:
             temp_keys = []
             for table in converted_table:
@@ -135,7 +144,7 @@ def convert_to_table(erd):
                                     if member[0] == table.name:
                                         temp_member.append(member)
                                         
-                                if temp_member[0][1] != ONE:
+                                if temp_member[0][1] != Multiplicity.ONE:
                                     primary_keys = primary_keys.union(table.primary_key)
                                     
                                 attributes = attributes.union(table.primary_key)
