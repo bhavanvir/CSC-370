@@ -7,4 +7,3 @@
 -- 0.9 marks: <20 operators
 -- 0.8 marks: correct answer
 
--- Replace this comment line with the actual query
