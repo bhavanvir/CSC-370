@@ -5,5 +5,5 @@
 -- 1.0 marks: <4 operators
 -- 0.8 marks: correct answer
 
-SELECT * FROM `county` 
-WHERE `sq_km` > `avg_income` AND `precip` > `temp`;
+SELECT * FROM county 
+WHERE sq_km > avg_income AND precip > temp;
