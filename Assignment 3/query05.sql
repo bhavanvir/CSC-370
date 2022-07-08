@@ -7,7 +7,10 @@
 -- 1.0 marks: <15 operators
 -- 0.8 marks: correct answer
 
-SELECT DISTINCT c.name, s.abbr, l.labour_force, l.unemployed / l.labour_force * 100 AS "Unemployment Rate"
+SELECT c.name, s.abbr, l.labour_force, (l.unemployed / l.labour_force) * 100 AS 'Unemployment Rate'
 FROM county c, countylabourstats l, state s
-WHERE c.fips = l.county AND l.unemployed / l.labour_force > 0.1 AND l.year = 2008
+WHERE c.fips = l.county
+    AND c.state = s.id
+    AND (l.unemployed / l.labour_force) > 0.1
+    AND l.year = 2008
 ORDER BY l.labour_force DESC;

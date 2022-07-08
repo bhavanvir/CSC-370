@@ -6,6 +6,6 @@
 
 SELECT c.*
 FROM county c 
-    LEFT JOIN countyindustries i ON c.fips = i.county
+LEFT JOIN countyindustries i ON c.fips = i.county
 WHERE i.county IS NULL
 ORDER BY c.life_expectancy;
