@@ -12,4 +12,4 @@ FROM state s
 JOIN county c ON s.id = c.state
 GROUP BY s.abbr
 ORDER BY TotalEmployees ASC
-LIMIT 1 OFFSET 25
+LIMIT 1 OFFSET 25;

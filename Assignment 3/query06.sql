@@ -30,4 +30,4 @@ FROM(
 
     SELECT name, abbr, snow, employees FROM T1
 ) AS T
-ORDER BY snow 
+ORDER BY snow; 
