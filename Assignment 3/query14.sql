@@ -10,7 +10,7 @@
 WITH T AS(
     SELECT * FROM countypopulation p
     JOIN county c ON p.county = c.fips
-    WHERE population >= 25000 AND year = 2018
+    WHERE p.population >= 25000 AND p.year = 2018
 )
 SELECT p2.name, p2.population, p1.name, p1.population FROM T p1
 JOIN T p2 ON p1.county <> p2.county AND p1.state = p2.state
