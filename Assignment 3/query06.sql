@@ -8,26 +8,25 @@
 -- 0.8 marks: correct answer
 
 WITH T1 AS(
-    SELECT fips, cname AS name, abbr, snow, employees
+    SELECT T.fips, T.n AS name, T.abbr, T.snow, r.employees
     FROM(
-        SELECT fips, name AS cname, abbr, snow FROM county
-        JOIN state ON state.id = state
-        WHERE county.name LIKE 'iron%' OR county.name LIKE 'mineral%' OR county.name LIKE 'coal%'
+        SELECT c.fips, c.name AS n, s.abbr, c.snow FROM county c
+        JOIN state s ON s.id = c.state
+        WHERE c.name LIKE '%iron%' OR c.name LIKE '%coal%' OR c.name LIKE '%mineral%'
     ) AS T
-    JOIN countyindustries ON county = fips
-    JOIN industry ON industry = id
-    WHERE name = 'Mining, quarrying, and oil and gas extraction'
+    JOIN countyindustries r ON r.county = T.fips
+    JOIN industry i ON r.industry = i.id
+    WHERE i.id = 19
 ), T2 AS(
-    SELECT fips, name, abbr, snow, NULL AS employees FROM county
-    JOIN state ON state.id = state
-    WHERE county.name LIKE 'iron%' OR county.name LIKE 'mineral%' OR county.name LIKE 'coal%'
+    SELECT c.fips, c.name, s.abbr, c.snow, NULL AS employees FROM county c
+    JOIN state s ON s.id = c.state
+    WHERE c.name LIKE '%iron%' OR c.name LIKE '%coal%' OR c.name LIKE '%mineral%'
 )
-SELECT name, abbr, employees
+SELECT T.name, T.abbr, T.employees
 FROM(
-    SELECT name, abbr,snow, employees FROM T2
-    WHERE T2.fips NOT IN (SELECT fips FROM T1)
+    SELECT T2.name, T2.abbr, T2.snow, T2.employees FROM T2
+    WHERE T2.fips NOT IN (SELECT T1.fips FROM T1)
     UNION
-
-    SELECT name, abbr, snow, employees FROM T1
+    SELECT T1.name, T1.abbr, T1.snow, T1.employees FROM T1
 ) AS T
-ORDER BY snow; 
+ORDER BY T.snow; 

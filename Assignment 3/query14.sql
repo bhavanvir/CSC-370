@@ -8,8 +8,8 @@
 -- 0.8 marks: correct answer
 
 WITH T AS(
-    SELECT * FROM countypopulation
-    JOIN county ON county = fips
+    SELECT * FROM countypopulation p
+    JOIN county c ON p.county = c.fips
     WHERE population >= 25000 AND year = 2018
 )
 SELECT p2.name, p2.population, p1.name, p1.population FROM T p1
