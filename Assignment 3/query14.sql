@@ -7,13 +7,12 @@
 -- 0.9 marks: <14 operators
 -- 0.8 marks: correct answer
 
-WITH T1 AS(
+WITH T AS(
     SELECT * FROM countypopulation
     JOIN county ON county = fips
-    JOIN state ON state = id
     WHERE population >= 25000 AND year = 2018
 )
-SELECT p2.name, p2.population, p1.name, p1.population FROM T1 p1
-JOIN T1 p2 ON p1.county <> p2.county AND p1.state = p2.state
+SELECT p2.name, p2.population, p1.name, p1.population FROM T p1
+JOIN T p2 ON p1.county <> p2.county AND p1.state = p2.state
 ORDER BY ABS(p1.population - p2.population)
 LIMIT 1;
