@@ -7,12 +7,19 @@
 -- 0.9 marks: <35 operators
 -- 0.8 marks: correct answer
 
-SELECT s.abbr, i.name, SUM(r.payroll) AS 'Total Payroll', (SUM(r.employees) / SUM(p.population) * 100) AS '% of Population' FROM countypopulation p
-JOIN county c ON p.county = c.fips
+WITH T AS (
+	SELECT c.state, SUM(p.population) AS 'Population' FROM countypopulation p
+    JOIN county c ON p.county = c.fips
+    JOIN state s ON c.state = s.id
+    WHERE p.year = 2019
+    GROUP BY c.state
+)
+SELECT s.abbr, i.name, SUM(r.payroll) AS 'Total Payrolls', ((SUM(r.employees) / T.Population) * 100) AS `% of Population` FROM countyindustries r
+JOIN county c ON r.county = c.fips
 JOIN state s ON c.state = s.id
-JOIN countyindustries r ON p.county = r.county
 JOIN industry i ON r.industry = i.id
-WHERE year = 2019 AND s.id != 49
+JOIN T ON T.state = c.state
+WHERE s.id != 49
 GROUP BY c.state, r.industry
-HAVING SUM(r.employees) / SUM(p.population) * 100 >= 7.5
-ORDER BY SUM(r.payroll) DESC;
+HAVING `% of Population` >= 7.5
+ORDER BY `Total Payrolls` DESC;
