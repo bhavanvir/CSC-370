@@ -4,8 +4,7 @@
 -- 1.0 marks: <8 operators
 -- 0.8 marks: correct answer
 
-SELECT c.*
-FROM county c 
+SELECT c.* FROM county c 
 LEFT JOIN countyindustries i ON c.fips = i.county
 WHERE i.county IS NULL
 ORDER BY c.life_expectancy;

@@ -6,14 +6,12 @@
 -- 0.8 marks: correct answer
 
 SELECT 
-    (SUM(MoreFemales = 'TRUE') / (SUM(MoreFemales = 'FALSE') + SUM(MoreFemales = 'TRUE'))) AS Fraction
+    (SUM(MoreFemales = 'TRUE') / (SUM(MoreFemales = 'FALSE') + SUM(MoreFemales = 'TRUE'))) AS 'Fraction'
 FROM(
     SELECT a.county,
-    CASE WHEN a.population > b.population THEN 'TRUE' ELSE 'FALSE' END AS MoreFemales
+    CASE WHEN a.population > b.population THEN 'TRUE' ELSE 'FALSE' END AS 'MoreFemales'
     FROM genderbreakdown a
     JOIN genderbreakdown b ON a.county = b.county
     WHERE a.gender = 'female'
     AND b.gender = 'male'
 ) AS T;
-
-
