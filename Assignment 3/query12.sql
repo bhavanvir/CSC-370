@@ -6,9 +6,11 @@
 -- 0.9 marks: <14 operators
 -- 0.8 marks: correct answer
 
-SELECT i.name
-FROM industry i
+SELECT i.name FROM industry i
 WHERE (
-    SELECT SUM(s.employees) FROM countyindustries s WHERE s.industry = i.id AND s.county NOT LIKE '6%%%'
+    SELECT SUM(r.employees) FROM countyindustries r 
+    JOIN county c ON r.county = c.fips
+    JOIN state s ON c.state = s.id
+    WHERE r.industry = i.id AND s.abbr != 'CA'
 ) >= 5000000
 ORDER BY i.name ASC;

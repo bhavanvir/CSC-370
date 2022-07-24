@@ -16,7 +16,7 @@ WITH T1 AS(
     ) AS T
     JOIN countyindustries r ON r.county = T.fips
     JOIN industry i ON r.industry = i.id
-    WHERE i.id = 19
+    WHERE i.name = 'Mining, quarrying, and oil and gas extraction'
 ), T2 AS(
     SELECT c.fips, c.name, s.abbr, c.snow, NULL AS employees FROM county c
     JOIN state s ON s.id = c.state

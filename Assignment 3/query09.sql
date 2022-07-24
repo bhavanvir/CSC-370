@@ -19,7 +19,7 @@ JOIN county c ON r.county = c.fips
 JOIN state s ON c.state = s.id
 JOIN industry i ON r.industry = i.id
 JOIN T ON T.state = c.state
-WHERE s.id != 49
+WHERE s.abbr != 'DC'
 GROUP BY c.state, r.industry
 HAVING `% of Population` >= 7.5
 ORDER BY `Total Payrolls` DESC;

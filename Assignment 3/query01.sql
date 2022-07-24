@@ -6,7 +6,9 @@
 
 SELECT s.abbr,
     SUM(
-        (SELECT SUM(i.employees) FROM countyindustries i WHERE i.industry = 10 AND i.county = c.fips)
+        (SELECT SUM(r.employees) FROM countyindustries r 
+        JOIN industry i ON r.industry = i.id
+        WHERE i.name = 'Educational Services' AND r.county = c.fips)
     ) AS TotalEmployees
 FROM state s
 JOIN county c ON s.id = c.state
