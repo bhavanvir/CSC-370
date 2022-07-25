@@ -4,8 +4,8 @@
 -- 1.0 marks: <8 operators
 -- 0.8 marks: correct answer
 
-SELECT s.abbr FROM state s
-WHERE (
-    SELECT COUNT(*) FROM county c WHERE c.state = s.id
-) >= 100
-ORDER BY s.abbr ASC;
+SELECT s.abbr FROM county c
+JOIN state s ON c.state = s.id
+GROUP BY c.state
+HAVING COUNT(*) >= 100
+ORDER BY s.abbr;

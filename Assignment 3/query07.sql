@@ -5,16 +5,10 @@
 -- 0.9 marks: <16 operators
 -- 0.8 marks: correct answer
 
-SELECT T.name, T.2010, T.population AS '2019', T.abbr, ABS(T.Percentage) AS 'Loss (%)'
-FROM(
-    SELECT *, (T.population - LAG(T.population, 1) OVER (PARTITION BY T.fips)) / LAG(T.population, 1) OVER (PARTITION BY T.fips) * 100 AS 'Percentage', LAG(T.population, 1) OVER (PARTITION BY T.fips) AS '2010'
-    FROM(
-        SELECT * FROM county c 
-        JOIN state s ON s.id = c.state 
-        JOIN countypopulation p ON p.county = c.fips
-        WHERE p.year IN (2010, 2019)
-    ) AS T
-    ORDER BY Percentage ASC
-) AS T
-WHERE T.Percentage = (SELECT(MIN(T.Percentage)))
-LIMIT 1 OFFSET 1;
+SELECT c.name, a.population AS '2010', b.population AS '2019', s.abbr, (((a.population-b.population) / a.population) * 100) AS 'Loss (%)' FROM countypopulation a
+LEFT JOIN countypopulation b ON a.county = b.county
+JOIN county c ON a.county = c.fips
+JOIN state s ON c.state = s.id
+WHERE a.year = 2010 AND b.year = 2019 
+ORDER BY `Loss (%)` DESC
+LIMIT 1;
