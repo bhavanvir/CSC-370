@@ -14,7 +14,25 @@ class ImplementMe:
     # Because the tree is balanced, it is also asymptotically logarithmic in the
     # number of keys that already exist in the index.
     @staticmethod
-    def InsertIntoIndex( index, key ):
+    def is_leaf(node):
+        return node.pointers.pointers[0] is None
+
+    @staticmethod
+    def find_node(root, key):
+        curr = root
+        while not(ImplementMe.is_leaf(curr)):
+            for idx, val in enumerate(curr.keys.keys):
+                if(val is None or val > key):
+                    curr = curr.pointers.pointers[idx]
+                    break
+                elif(idx == curr.get_num_keys() - 1):
+                    curr = curr.pointers.pointers[idx + 1]
+                    break 
+        
+        return curr
+
+    @staticmethod
+    def InsertIntoIndex(index, key):
         return index
 
     # Returns a boolean that indicates whether a given key
@@ -23,8 +41,10 @@ class ImplementMe:
     # Complexity: Guaranteed not to touch more nodes than the
     # height of the tree
     @staticmethod
-    def LookupKeyInIndex( index, key ):
-        return False
+    def LookupKeyInIndex(index, key):
+        curr = ImplementMe.find_node(index.root, key)
+
+        return curr.keys.keys.count(key) != 0
 
     # Returns a list of keys in a B+-tree index within the half-open
     # interval [lower_bound, upper_bound)
@@ -32,5 +52,5 @@ class ImplementMe:
     # Complexity: Guaranteed not to touch more nodes than the height
     # of the tree and the number of leaves overlapping the interval.
     @staticmethod
-    def RangeSearchInIndex( index, lower_bound, upper_bound ):
+    def RangeSearchInIndex(index, lower_bound, upper_bound):
         return []
