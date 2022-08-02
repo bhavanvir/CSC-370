@@ -18,15 +18,15 @@ class ImplementMe:
         return node.pointers.pointers[0] is None
 
     @staticmethod
-    def find_node(root, key):
+    def find(root, key):
         curr = root
-        while not(ImplementMe.is_leaf(curr)):
-            for idx, val in enumerate(curr.keys.keys):
-                if(val is None or val > key):
-                    curr = curr.pointers.pointers[idx]
+        while not ImplementMe.is_leaf(curr):
+            for loc, val in enumerate(curr.keys.keys):
+                if val is None or val > key:
+                    curr = curr.pointers.pointers[loc]
                     break
-                elif(idx == curr.get_num_keys() - 1):
-                    curr = curr.pointers.pointers[idx + 1]
+                elif loc == curr.get_num_keys() - 1:
+                    curr = curr.pointers.pointers[loc + 1]
                     break 
         
         return curr
@@ -42,7 +42,7 @@ class ImplementMe:
     # height of the tree
     @staticmethod
     def LookupKeyInIndex(index, key):
-        curr = ImplementMe.find_node(index.root, key)
+        curr = ImplementMe.find(index.root, key)
 
         return curr.keys.keys.count(key) != 0
 
@@ -53,4 +53,35 @@ class ImplementMe:
     # of the tree and the number of leaves overlapping the interval.
     @staticmethod
     def RangeSearchInIndex(index, lower_bound, upper_bound):
-        return []
+        curr = ImplementMe.find(index.root, lower_bound)
+        head = None
+
+        if lower_bound == upper_bound and ImplementMe.LookupKeyInIndex(index, lower_bound):
+            return [lower_bound]
+        
+        for loc, val in enumerate(curr.keys.keys):
+            if val >= lower_bound:
+                head = loc
+                break
+    
+        if head is None or curr.keys.keys[head] >= upper_bound:
+            return []
+        vl = [curr.keys.keys[head]]
+
+        while not val >= upper_bound:
+            if head == 0:
+                val = curr.keys.keys[1]
+                if val is None:
+                    val = curr.keys.keys[0]
+                elif val < upper_bound:
+                    vl.append(val)
+                head += 1
+            elif head != 0:
+                curr = curr.pointers.pointers[2]
+                if curr is None:
+                    return vl 
+                elif curr.keys.keys[0] < upper_bound:
+                    vl.append(curr.keys.keys[0])
+                head = 0
+        
+        return list(filter(None, vl))
