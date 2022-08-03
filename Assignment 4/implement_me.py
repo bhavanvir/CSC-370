@@ -1,7 +1,6 @@
 # Implementation of B+-tree functionality.
 
 from index import *
-import math
 
 # You should implement all of the static functions declared
 # in the ImplementMe class and submit this (and only this!) file.
@@ -42,9 +41,9 @@ class ImplementMe:
         tl = sorted(tl, key = lambda x: (x is None, x))
 
         if flag:
-            return tl, Node(), tl.index(key), math.ceil(Index.NUM_KEYS / 2), 0
+            return tl, Node(), tl.index(key), -(-Index.NUM_KEYS//2), 0
         else:
-            return tl, Node(), math.ceil(Index.NUM_KEYS / 2) - 1, 0
+            return tl, Node(), -(-Index.NUM_KEYS//2) - 1, 0
             
     @staticmethod
     def parent(node, child):
