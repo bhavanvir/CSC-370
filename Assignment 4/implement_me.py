@@ -46,7 +46,6 @@ class ImplementMe:
         else:
             return tl, Node(), math.ceil(Index.NUM_KEYS / 2) - 1, 0
             
-    
     @staticmethod
     def parent(node, child):
         for pt in node.pointers.pointers:
