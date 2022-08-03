@@ -14,12 +14,8 @@ class ImplementMe:
     # Because the tree is balanced, it is also asymptotically logarithmic in the
     # number of keys that already exist in the index.
     @staticmethod
-    def is_leaf(node):
-        return node.pointers.pointers[0] is None
-
-    @staticmethod
     def find(node, key):
-        while not ImplementMe.is_leaf(node):
+        while not node.pointers.pointers[0] is None:
             for loc, val in enumerate(node.keys.keys):
                 if val is None or val > key:
                     node = node.pointers.pointers[loc]
@@ -29,10 +25,6 @@ class ImplementMe:
                     break 
         
         return node
-
-    @staticmethod
-    def is_full(node):
-        return node.keys.keys.count(None) == 0
 
     @staticmethod
     def allocate_space(node, key, flag):
@@ -61,7 +53,7 @@ class ImplementMe:
 
     @staticmethod
     def internal(root, node, child, key):
-        if ImplementMe.is_full(node):
+        if node.keys.keys.count(None) == 0:
             tl, nn, nki, si, ni = ImplementMe.allocate_space(node, key, True)
             
             for loc, val in enumerate(tl):
@@ -103,9 +95,9 @@ class ImplementMe:
             
             for i in range(Index.NUM_KEYS - 1, ii, -1):
                 node.keys.keys[i] = node.keys.keys[i - 1]
+            node.keys.keys[ii] = key
             for i in range(Index.FAN_OUT - 1, ii + 1, -1):
                 node.pointers.pointers[i] = node.pointers.pointers[i - 1]
-            node.keys.keys[ii] = key
             node.pointers.pointers[ii + 1] = child 
 
         return root
@@ -140,9 +132,9 @@ class ImplementMe:
         
         curr = ImplementMe.find(index.root, key)
 
-        if ImplementMe.is_full(curr):
+        if curr.keys.keys.count(None) == 0:
             return Index(ImplementMe.split(index.root, curr, key)) 
-        elif not ImplementMe.is_full(curr):
+        else:
             for loc, val in enumerate(curr.keys.keys):
                 if val is None:
                     curr.keys.keys[loc] = key
