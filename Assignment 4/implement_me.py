@@ -19,58 +19,47 @@ class ImplementMe:
         return node.pointers.pointers[0] is None
 
     @staticmethod
-    def find(root, key):
-        curr = root
-        while not ImplementMe.is_leaf(curr):
-            for loc, val in enumerate(curr.keys.keys):
+    def find(node, key):
+        while not ImplementMe.is_leaf(node):
+            for loc, val in enumerate(node.keys.keys):
                 if val is None or val > key:
-                    curr = curr.pointers.pointers[loc]
+                    node = node.pointers.pointers[loc]
                     break
-                elif loc == curr.get_num_keys() - 1:
-                    curr = curr.pointers.pointers[loc + 1]
+                elif loc == node.get_num_keys() - 1:
+                    node = node.pointers.pointers[loc + 1]
                     break 
         
-        return curr
+        return node
 
     @staticmethod
     def is_full(node):
         return node.keys.keys.count(None) == 0
-    
-    @staticmethod
-    def sort_node(vl):
-        return sorted(vl, key = lambda x: (x is None, x))
-    
-    @staticmethod
-    def root(l, r, key):
-        return Node(keys = KeySet([key, None]), pointers = PointerSet([l, r, None]))
 
     @staticmethod
     def allocate_space(node, key, flag):
         tl = node.keys.keys.copy()
         tl.append(key)
-        tl = ImplementMe.sort_node(tl)
+        tl = sorted(tl, key = lambda x: (x is None, x))
 
         if flag:
             return tl, Node(), tl.index(key), math.ceil(Index.NUM_KEYS / 2), 0
-        elif not flag:
+        else:
             return tl, Node(), math.ceil(Index.NUM_KEYS / 2) - 1, 0
             
     
     @staticmethod
-    def parent(curr, child):
-        for pt in curr.pointers.pointers:
-            if pt is None:
-                continue
-            elif pt == child:
-                return curr
+    def parent(node, child):
+        for pt in node.pointers.pointers:
+            if pt is not None and pt == child:
+                return node
         
         ck = child.keys.keys[0]
 
-        for loc, val in enumerate(curr.keys.keys):
+        for loc, val in enumerate(node.keys.keys):
             if val is None or val > ck:
-                return ImplementMe.parent(curr.pointers.pointers[loc], child)
+                return ImplementMe.parent(node.pointers.pointers[loc], child)
         
-        return ImplementMe.parent(curr.pointers.pointers[Index.NUM_KEYS], child)
+        return ImplementMe.parent(node.pointers.pointers[Index.NUM_KEYS], child)
 
     @staticmethod
     def internal(root, node, child, key):
@@ -85,8 +74,6 @@ class ImplementMe:
                     node.keys.keys[loc] = None
                 else:
                     nn.keys.keys[ni] = val
-                    if loc < Index.NUM_KEYS:
-                        node.keys.keys[loc] = None
                     ni += 1
             
             if nki == 0:
@@ -102,7 +89,7 @@ class ImplementMe:
             node.pointers.pointers[2] = None
 
             if node == root:
-                nr = ImplementMe.root(node, nn, pk)
+                nr = Node(keys = KeySet([pk, None]), pointers = PointerSet([node, nn, None]))
             else:
                 nr = ImplementMe.internal(root, ImplementMe.parent(root, node), nn, pk)
             return nr
@@ -141,8 +128,8 @@ class ImplementMe:
         nn.pointers.pointers[Index.FAN_OUT - 1] = node.pointers.pointers[Index.FAN_OUT - 1]
         node.pointers.pointers[Index.FAN_OUT - 1] = nn
 
-        if(node == root):
-            nr = ImplementMe.root(node, nn, nn.keys.keys[0])
+        if node == root:
+            nr = Node(keys = KeySet([nn.keys.keys[0], None]), pointers = PointerSet([node, nn, None]))
         else:
             nr = ImplementMe.internal(root, ImplementMe.parent(root, node), nn, nn.keys.keys[0])
         
@@ -156,15 +143,13 @@ class ImplementMe:
         curr = ImplementMe.find(index.root, key)
 
         if ImplementMe.is_full(curr):
-            root = ImplementMe.split(index.root, curr, key)
-            tree = Index(root = root)
-            return tree 
+            return Index(ImplementMe.split(index.root, curr, key)) 
         elif not ImplementMe.is_full(curr):
             for loc, val in enumerate(curr.keys.keys):
                 if val is None:
                     curr.keys.keys[loc] = key
                     break
-            curr.keys.keys = ImplementMe.sort_node(curr.keys.keys)
+            curr.keys.keys = sorted(curr.keys.keys, key = lambda x: (x is None, x))
         
         return index
 
