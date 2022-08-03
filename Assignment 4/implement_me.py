@@ -23,7 +23,7 @@ class ImplementMe:
                 elif loc == node.get_num_keys() - 1:
                     node = node.pointers.pointers[loc + 1]
                     break 
-        
+            
         return node
 
     @staticmethod
@@ -32,73 +32,70 @@ class ImplementMe:
         tl.append(key)
         tl = sorted(tl, key = lambda x: (x is None, x))
 
-        if flag:
-            return tl, Node(), tl.index(key), -(-Index.NUM_KEYS//2), 0
-        else:
-            return tl, Node(), -(-Index.NUM_KEYS//2) - 1, 0
+        return (tl, Node(), tl.index(key), -(-Index.NUM_KEYS//2), 0) if flag else (tl, Node(), -(-Index.NUM_KEYS//2) - 1, 0)
             
     @staticmethod
     def parent(node, child):
         for pt in node.pointers.pointers:
-            if pt is not None and pt == child:
-                return node
+            if pt is not None and pt == child: return node
         
         ck = child.keys.keys[0]
 
         for loc, val in enumerate(node.keys.keys):
-            if val is None or val > ck:
-                return ImplementMe.parent(node.pointers.pointers[loc], child)
+            if val is None or val > ck: return ImplementMe.parent(node.pointers.pointers[loc], child)
         
         return ImplementMe.parent(node.pointers.pointers[Index.NUM_KEYS], child)
 
     @staticmethod
-    def internal(root, node, child, key):
-        if node.keys.keys.count(None) == 0:
-            tl, nn, nki, si, ni = ImplementMe.allocate_space(node, key, True)
+    def overflow(root, node, child, key):
+        tl, nn, nki, si, ni = ImplementMe.allocate_space(node, key, True)
             
-            for loc, val in enumerate(tl):
-                if loc < si:
-                    node.keys.keys[loc] = val
-                elif loc == si:
-                    pk = val
-                    node.keys.keys[loc] = None
-                else:
-                    nn.keys.keys[ni] = val
-                    ni += 1
-            
-            if nki == 0:
-                nn.pointers.pointers[0] = node.pointers.pointers[1]
-                nn.pointers.pointers[1] = node.pointers.pointers[2]
-                node.pointers.pointers[1] = child 
-            elif nki == 1:
-                nn.pointers.pointers[0] = child
-                nn.pointers.pointers[1] = node.pointers.pointers[2]
+        for loc, val in enumerate(tl):
+            if loc < si: node.keys.keys[loc] = val
+            elif loc == si:
+                pk = val
+                node.keys.keys[loc] = None
             else:
-                nn.pointers.pointers[0] = node.pointers.pointers[2]
-                nn.pointers.pointers[1] = child
-            node.pointers.pointers[2] = None
-
-            if node == root:
-                nr = Node(keys = KeySet([pk, None]), pointers = PointerSet([node, nn, None]))
-            else:
-                nr = ImplementMe.internal(root, ImplementMe.parent(root, node), nn, pk)
-            return nr
+                nn.keys.keys[ni] = val
+                ni += 1
+        
+        if nki == 0:
+            nn.pointers.pointers[0] = node.pointers.pointers[1]
+            nn.pointers.pointers[1] = node.pointers.pointers[2]
+            node.pointers.pointers[1] = child 
+        elif nki == 1:
+            nn.pointers.pointers[0] = child
+            nn.pointers.pointers[1] = node.pointers.pointers[2]
         else:
-            ii = 0
-            for loc, val in enumerate(node.keys.keys):
-                if val is None:
-                    node.keys.keys[loc] = key
-                    node.pointers.pointers[loc + 1] = child
-                elif val > key:
-                    ii = loc 
-                    continue
-            
-            for i in range(Index.NUM_KEYS - 1, ii, -1):
-                node.keys.keys[i] = node.keys.keys[i - 1]
-            node.keys.keys[ii] = key
-            for i in range(Index.FAN_OUT - 1, ii + 1, -1):
-                node.pointers.pointers[i] = node.pointers.pointers[i - 1]
-            node.pointers.pointers[ii + 1] = child 
+            nn.pointers.pointers[0] = node.pointers.pointers[2]
+            nn.pointers.pointers[1] = child
+        node.pointers.pointers[2] = None
+
+        if node == root: nr = Node(keys = KeySet([pk, None]), pointers = PointerSet([node, nn, None]))
+        else: nr = ImplementMe.internal(root, ImplementMe.parent(root, node), nn, pk)
+
+        return nr
+
+    @staticmethod
+    def no_overflow(root, node, child, key):
+        ii = None
+        for loc, val in enumerate(node.keys.keys):
+            if val is None:
+                node.keys.keys[loc] = key
+                node.pointers.pointers[loc + 1] = child
+            elif val > key:
+                ii = loc 
+                continue
+        
+        for i in range(Index.NUM_KEYS - 1, ii, -1): node.keys.keys[i] = node.keys.keys[i - 1]
+        node.keys.keys[ii] = key
+        for i in range(Index.FAN_OUT - 1, ii + 1, -1): node.pointers.pointers[i] = node.pointers.pointers[i - 1]
+        node.pointers.pointers[ii + 1] = child 
+        
+    @staticmethod
+    def internal(root, node, child, key):
+        if node.keys.keys.count(None) == 0: root = ImplementMe.overflow(root, node, child, key)
+        else: ImplementMe.no_overflow(root, node, child, key) 
 
         return root
 
@@ -107,33 +104,27 @@ class ImplementMe:
         tl, nn, si, ni = ImplementMe.allocate_space(node, key, False)
 
         for loc, val in enumerate(tl):
-            if loc <= si:
-                node.keys.keys[loc] = val
+            if loc <= si: node.keys.keys[loc] = val
             else:
                 nn.keys.keys[ni] = val
-                if loc < Index.NUM_KEYS:
-                    node.keys.keys[loc] = None 
+                if loc < Index.NUM_KEYS: node.keys.keys[loc] = None 
                 ni += 1
         
         nn.pointers.pointers[Index.FAN_OUT - 1] = node.pointers.pointers[Index.FAN_OUT - 1]
         node.pointers.pointers[Index.FAN_OUT - 1] = nn
 
-        if node == root:
-            nr = Node(keys = KeySet([nn.keys.keys[0], None]), pointers = PointerSet([node, nn, None]))
-        else:
-            nr = ImplementMe.internal(root, ImplementMe.parent(root, node), nn, nn.keys.keys[0])
+        if node == root: nr = Node(keys = KeySet([nn.keys.keys[0], None]), pointers = PointerSet([node, nn, None]))
+        else: nr = ImplementMe.internal(root, ImplementMe.parent(root, node), nn, nn.keys.keys[0])
         
         return nr
 
     @staticmethod
     def InsertIntoIndex(index, key):
-        if ImplementMe.LookupKeyInIndex(index, key):
-            return index 
+        if ImplementMe.LookupKeyInIndex(index, key): return index 
         
         curr = ImplementMe.find(index.root, key)
 
-        if curr.keys.keys.count(None) == 0:
-            return Index(ImplementMe.split(index.root, curr, key)) 
+        if curr.keys.keys.count(None) == 0: return Index(ImplementMe.split(index.root, curr, key)) 
         else:
             for loc, val in enumerate(curr.keys.keys):
                 if val is None:
@@ -162,32 +153,26 @@ class ImplementMe:
         curr = ImplementMe.find(index.root, lower_bound)
         head = None
 
-        if lower_bound == upper_bound and ImplementMe.LookupKeyInIndex(index, lower_bound):
-            return [lower_bound]
+        if lower_bound == upper_bound and ImplementMe.LookupKeyInIndex(index, lower_bound): return [lower_bound]
         
         for loc, val in enumerate(curr.keys.keys):
             if val >= lower_bound:
                 head = loc
                 break
     
-        if head is None or curr.keys.keys[head] >= upper_bound:
-            return []
+        if head is None or curr.keys.keys[head] >= upper_bound: return []
         vl = [curr.keys.keys[head]]
 
         while not val >= upper_bound:
             if head == 0:
                 val = curr.keys.keys[1]
-                if val is None:
-                    val = curr.keys.keys[0]
-                elif val < upper_bound:
-                    vl.append(val)
+                if val is None: val = curr.keys.keys[0]
+                elif val < upper_bound: vl.append(val)
                 head += 1
             elif head != 0:
                 curr = curr.pointers.pointers[2]
-                if curr is None:
-                    return vl 
-                elif curr.keys.keys[0] < upper_bound:
-                    vl.append(curr.keys.keys[0])
+                if curr is None: return vl 
+                elif curr.keys.keys[0] < upper_bound: vl.append(curr.keys.keys[0])
                 head = 0
         
         return list(filter(None, vl))
