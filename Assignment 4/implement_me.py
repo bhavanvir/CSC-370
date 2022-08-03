@@ -150,9 +150,7 @@ class ImplementMe:
     # height of the tree
     @staticmethod
     def LookupKeyInIndex(index, key):
-        curr = ImplementMe.find(index.root, key)
-
-        return curr.keys.keys.count(key) != 0
+        return (ImplementMe.find(index.root, key)).keys.keys.count(key) != 0
 
     # Returns a list of keys in a B+-tree index within the half-open
     # interval [lower_bound, upper_bound)
