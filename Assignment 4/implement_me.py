@@ -114,14 +114,13 @@ class ImplementMe:
         if ImplementMe.LookupKeyInIndex(index, key): return index 
         
         curr = ImplementMe.find(index.root, key)
-
         if curr.keys.keys.count(None) == 0: return Index(ImplementMe.split(index.root, curr, key)) 
-        else:
-            for loc, val in enumerate(curr.keys.keys):
-                if val is None:
-                    curr.keys.keys[loc] = key
-                    break
-            curr.keys.keys = sorted(curr.keys.keys, key = lambda x: (x is None, x))
+        
+        for loc, val in enumerate(curr.keys.keys):
+            if val is None:
+                curr.keys.keys[loc] = key
+                break
+        curr.keys.keys = sorted(curr.keys.keys, key = lambda x: (x is None, x))
         
         return index
 
