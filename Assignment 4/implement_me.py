@@ -48,16 +48,9 @@ class ImplementMe:
 
     @staticmethod
     def connect(nki, nn, node, child):
-        if nki == 0:
-            nn.pointers.pointers[0] = node.pointers.pointers[1]
-            nn.pointers.pointers[1] = node.pointers.pointers[2]
-            node.pointers.pointers[1] = child 
-        elif nki == 1:
-            nn.pointers.pointers[0] = child
-            nn.pointers.pointers[1] = node.pointers.pointers[2]
-        else:
-            nn.pointers.pointers[0] = node.pointers.pointers[2]
-            nn.pointers.pointers[1] = child
+        nn.pointers.pointers[1] = node.pointers.pointers[2] if nki in [0, 1] else child
+        nn.pointers.pointers[0] = node.pointers.pointers[1] if nki == 0 else node.pointers.pointers[2]
+        if nki == 0: node.pointers.pointers[1] = child 
         node.pointers.pointers[2] = None
 
     @staticmethod
