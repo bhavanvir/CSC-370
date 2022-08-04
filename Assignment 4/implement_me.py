@@ -140,8 +140,7 @@ class ImplementMe:
     # of the tree and the number of leaves overlapping the interval.
     @staticmethod
     def RangeSearchInIndex(index, lower_bound, upper_bound):
-        curr = ImplementMe.find(index.root, lower_bound)
-        head = None
+        curr, head = ImplementMe.find(index.root, lower_bound), None
 
         if lower_bound == upper_bound and ImplementMe.LookupKeyInIndex(index, lower_bound): return [lower_bound]
         
