@@ -75,10 +75,7 @@ class ImplementMe:
   
         ImplementMe.connect(nki, nn, node, child)
 
-        if node == root: nr = Node(keys = KeySet([pk, None]), pointers = PointerSet([node, nn, None]))
-        else: nr = ImplementMe.internal(root, ImplementMe.parent(root, node), nn, pk)
-
-        return nr
+        return Node(keys = KeySet([pk, None]), pointers = PointerSet([node, nn, None])) if node == root else ImplementMe.internal(root, ImplementMe.parent(root, node), nn, pk)
 
     @staticmethod
     def no_overflow(root, node, child, key):
