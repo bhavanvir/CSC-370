@@ -113,11 +113,8 @@ class ImplementMe:
         
         nn.pointers.pointers[Index.FAN_OUT - 1] = node.pointers.pointers[Index.FAN_OUT - 1]
         node.pointers.pointers[Index.FAN_OUT - 1] = nn
-
-        if node == root: nr = Node(keys = KeySet([nn.keys.keys[0], None]), pointers = PointerSet([node, nn, None]))
-        else: nr = ImplementMe.internal(root, ImplementMe.parent(root, node), nn, nn.keys.keys[0])
         
-        return nr
+        return Node(keys = KeySet([nn.keys.keys[0], None]), pointers = PointerSet([node, nn, None])) if node == root else ImplementMe.internal(root, ImplementMe.parent(root, node), nn, nn.keys.keys[0])
 
     @staticmethod
     def InsertIntoIndex(index, key):
