@@ -47,18 +47,7 @@ class ImplementMe:
         return ImplementMe.parent(node.pointers.pointers[Index.NUM_KEYS], child)
 
     @staticmethod
-    def overflow(root, node, child, key):
-        tl, nn, nki, si, ni = ImplementMe.allocate_space(node, key, True)
-            
-        for loc, val in enumerate(tl):
-            if loc < si: node.keys.keys[loc] = val
-            elif loc == si:
-                pk = val
-                node.keys.keys[loc] = None
-            else:
-                nn.keys.keys[ni] = val
-                ni += 1
-        
+    def connect(nki, nn, node, child):
         if nki == 0:
             nn.pointers.pointers[0] = node.pointers.pointers[1]
             nn.pointers.pointers[1] = node.pointers.pointers[2]
@@ -70,6 +59,21 @@ class ImplementMe:
             nn.pointers.pointers[0] = node.pointers.pointers[2]
             nn.pointers.pointers[1] = child
         node.pointers.pointers[2] = None
+
+    @staticmethod
+    def overflow(root, node, child, key):
+        tl, nn, nki, si, ni = ImplementMe.allocate_space(node, key, True)
+            
+        for loc, val in enumerate(tl):
+            if loc < si: node.keys.keys[loc] = val
+            elif loc == si:
+                pk = val
+                node.keys.keys[loc] = None
+            else:
+                nn.keys.keys[ni] = val
+                ni += 1
+  
+        ImplementMe.connect(nki, nn, node, child)
 
         if node == root: nr = Node(keys = KeySet([pk, None]), pointers = PointerSet([node, nn, None]))
         else: nr = ImplementMe.internal(root, ImplementMe.parent(root, node), nn, pk)
