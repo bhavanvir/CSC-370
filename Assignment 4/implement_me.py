@@ -77,9 +77,7 @@ class ImplementMe:
             if val is None:
                 node.keys.keys[loc] = key
                 node.pointers.pointers[loc + 1] = child
-            elif val > key:
-                ii = loc 
-                continue
+            elif val > key: ii = loc 
         
         for i in range(Index.NUM_KEYS - 1, ii, -1): node.keys.keys[i] = node.keys.keys[i - 1]
         node.keys.keys[ii] = key
