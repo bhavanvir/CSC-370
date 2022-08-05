@@ -152,9 +152,8 @@ class ImplementMe:
 
         while not val >= upper_bound:
             if head == 0:
-                val = curr.keys.keys[1]
-                if val is None: val = curr.keys.keys[0]
-                elif val < upper_bound: vl.append(val)
+                if curr.keys.keys[1] is None: curr.keys.keys[1] = curr.keys.keys[0]
+                elif curr.keys.keys[1] < upper_bound: vl.append(curr.keys.keys[1])
                 head += 1
             else:
                 curr = curr.pointers.pointers[2]
