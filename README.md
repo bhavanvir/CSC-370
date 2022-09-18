@@ -28,6 +28,8 @@ The course will consist of four modules, which each depend on the prior module. 
         • Recovery, logging, redundancy, and resilience
         
 ## Course Objectives And Learning Outcomes
+The objective of the course is to introduce database management systems (DBMS) and the theory behind their design and use. There will be an emphasis on how to organize, maintain and retrieve--efficiently, and effectively--information from a DBMS. The course will have four main areas of focus:
+
     • Database design: how can we describe the world in terms of data?
     • Data analysis: how can we answer questions about the world in terms of questions on such data?
     • Concurrency and robustness: how does the database management system (DBMS) allow multiple users to query and modify the same data? What happens when there is a system failure?
